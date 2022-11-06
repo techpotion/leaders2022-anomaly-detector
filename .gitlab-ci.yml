@@ -1,0 +1,28 @@
+stages:
+  - build
+  - deploy_compose
+
+build:
+  stage: build
+  script:
+    - sh .gitlab-ci/docker_build.sh
+  only:
+    - main
+  tags:
+    - shell-runner
+
+deploy_compose:
+  stage: deploy_compose
+  environment:
+    name: prod
+  script:
+    - sh .gitlab-ci/docker_deploy.sh
+  variables:
+    ENV: prod
+    APP: leadershack2022-anomaly-detector
+  when: manual
+  only:
+    - main
+  tags:
+    - shell-runner
+
