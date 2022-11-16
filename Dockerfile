@@ -1,8 +1,11 @@
-FROM python:3.10.8
+FROM python:3.10.8-slim-bullseye
 
-COPY . /app
-WORKDIR /app
+RUN python3 -m venv /opt/venv
 
-RUN pip install -r requirements.txt
+# Install dependencies:
+COPY requirements.txt .
+RUN /opt/venv/bin/pip install -r requirements.txt
 
-CMD python3 main.py
+# Run the application:
+COPY . .
+CMD /opt/venv/bin/python main.py

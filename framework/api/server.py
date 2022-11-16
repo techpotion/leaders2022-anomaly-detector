@@ -1,9 +1,12 @@
-from flask import Flask, request
+from flask import Flask, Response, request
 
-from usecase.combinedModelPredictMultipleUsecase import (
+from usecase.combined_model_predict_multiple_usecase import (
     CombinedModelPredictMultipleUsecase,
 )
-from usecase.combinedModelPredictSingleUsecase import CombinedModelPredictSingleUsecase
+from usecase.combined_model_predict_single_usecase import (
+    CombinedModelPredictSingleUsecase,
+)
+from usecase.plot_efficiency_usecase import PlotEfficiencyUsecase
 
 class Server:
     __host: str
@@ -11,6 +14,7 @@ class Server:
     __engine: Flask
     __combined_model_predict_multiple_usecase: CombinedModelPredictMultipleUsecase
     __combined_model_predict_single_usecase: CombinedModelPredictSingleUsecase
+    __plot_efficiency_usecase: PlotEfficiencyUsecase
 
     def __init_flask_with_routes(self) -> None:
         engine = Flask(__name__)
@@ -29,6 +33,13 @@ class Server:
             content = request.json
             return self.__combined_model_predict_multiple_usecase.execute(content)
 
+        @engine.route("/plot_efficiency", methods=['POST'])
+        def plot_efficiency_handler():
+            content = request.json
+            return Response(
+                str(self.__plot_efficiency_usecase.execute(content)),
+                mimetype='image/svg+xml',
+            )
 
         self.__engine = engine
 
@@ -39,12 +50,14 @@ class Server:
             port: int,
             combined_model_predict_multiple_usecase: CombinedModelPredictMultipleUsecase,
             combined_model_predict_single_usecase: CombinedModelPredictSingleUsecase,
+            plot_efficiency_usecase: PlotEfficiencyUsecase
         ) -> None:
         self.__host = host
         self.__port = port
 
         self.__combined_model_predict_multiple_usecase = combined_model_predict_multiple_usecase
         self.__combined_model_predict_single_usecase = combined_model_predict_single_usecase
+        self.__plot_efficiency_usecase = plot_efficiency_usecase
 
         self.__init_flask_with_routes()
 

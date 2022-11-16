@@ -2,7 +2,7 @@ stages:
   - build
   - deploy_compose
 
-build:
+build:prod:
   stage: build
   script:
     - sh .gitlab-ci/docker_build.sh
@@ -11,7 +11,7 @@ build:
   tags:
     - shell-runner
 
-deploy_compose:
+deploy:prod:
   stage: deploy_compose
   environment:
     name: prod
@@ -26,3 +26,26 @@ deploy_compose:
   tags:
     - shell-runner
 
+build:test:
+  stage: build
+  script:
+    - sh .gitlab-ci/docker_build_test.sh
+  only:
+    - test
+  tags:
+    - shell-runner
+
+deploy:test:
+  stage: deploy_compose
+  environment:
+    name: test
+  script:
+    - sh .gitlab-ci/docker_deploy_test.sh
+  variables:
+    ENV: test
+    APP: leadershack2022-anomaly-detector-test
+  when: manual
+  only:
+    - test
+  tags:
+    - shell-runner
